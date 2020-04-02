@@ -1,0 +1,258 @@
+Link followed: https://testdriven.io/blog/django-custom-user-model/
+info: We will create a sample signup and login, logout system.
+*For easier signup system, follow: https://www.youtube.com/watch?v=BS1_sILek_w
+
+1. Create hello world project.
+2. Register myapp in settings.py
+3. Create managers.py in myapp/managers.py
+4. Update models.py with AbstractUser model.
+5. Update settings.py with:  AUTH_USER_MODEL = 'myapp.CustomUser'
+6. Now run below commands:
+	python manage.py makemigrations
+	python manage.py migrate
+	python manage.py createsuperuser
+	make sure it passes the test: python manage.py test
+7. Now create myapp/forms.py.
+8. Now update myapp/admin.py
+9. Create myapp/templates/signup.html
+10. Update myapp/urls.py and make its entry in main urls.py
+11. Update myapp/views.py
+------Now Signup System is completed. Next we will go for login and logout.
+12. Create myapp/templates/home.html
+13. Create myapp/templates/login.html
+14. Update myapp/urls.py
+15. Update myapp/views.py with: from django.contrib import auth
+	and add def of login and logout
+	
+Now run: python manage.py runserver
+
+	
+
+==========3. managers.py=============================================
+from django.contrib.auth.base_user import BaseUserManager
+from django.utils.translation import ugettext_lazy as _
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password, **extra_fields):
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+        return self.create_user(email, password, **extra_fields)
+		
+==========4. models.py=================================================
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import ugettext_lazy as _
+
+from .managers import CustomUserManager
+
+
+class CustomUser(AbstractUser):
+    username = None
+    email = models.EmailField(_('email address'), unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
+		
+==========7. myapp/forms.py=========================================
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from .models import CustomUser
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm):
+        model = CustomUser
+        fields = ('email','first_name','last_name')
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = CustomUser
+        fields = ('email','first_name','last_name')
+		
+============8. myapp/admin.py=======================================
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .models import CustomUser
+
+class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = CustomUser
+    list_display = ('email', 'is_staff', 'is_active','first_name','last_name',)
+    list_filter = ('email', 'is_staff', 'is_active','first_name','last_name',)
+	# to be displayed while editing a user.
+    fieldsets = (
+        (None, {'fields': ('first_name','last_name','email', 'password')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+    )
+	# to be displayed while adding a user.
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('first_name','last_name','email', 'password1', 'password2', 'is_staff', 'is_active')}
+        ),
+    )
+    search_fields = ('email',)
+    ordering = ('email',)
+
+admin.site.register(CustomUser, CustomUserAdmin)
+
+==================9. myapp/templates/signup.html=================================
+<body bgcolor="black" style="color:white;">
+<center><h2>Welcome to page signup page.</h2><hr/></center>
+<hr/><hr/>
+<div style="color:#9c0000;">
+{% if error_keys|length != 0 %}
+Fix these ERRORS first:
+	{% for element in error_values %}
+		{{element}}
+	{% endfor %}
+{% endif %}
+</div>
+<form method="post" action="/signup/">
+  {% csrf_token %}
+  {% for field in form %}
+	{{field.label}}: {{field}}<br/><br/>	
+  {% endfor %}
+  <button type="submit">Register Account</button>
+</form>
+<hr/>
+<a  href="/login"><button>Login</button></a>
+</body>
+
+===============10. myapp/urls.py=====================================
+from django.urls import path
+	from . import views
+
+	urlpatterns = [
+		path('',views.index,name="first_page"),
+		path('signup/',views.signup,name="Sign Up")
+	]
+	
+==============11. myapp/views.py=====================================
+from django.shortcuts import render
+from django.http import HttpResponse
+from .forms import CustomUserCreationForm
+from django.forms import ValidationError
+
+def index(request):
+	return HttpResponse("Hello!! Welcome to page.")
+	
+def signup(request):
+	#err = {}
+	err_keys = []
+	err_values = []
+	if request.method == 'POST':
+		form = CustomUserCreationForm(request.POST)
+		err = form.errors # this line can be improved.
+		err_keys = list(err.keys())
+		err_values = list(err.values())
+		if form.is_valid():
+			form.save()
+			return HttpResponse("Saved, form is valid.")
+		else:
+			return render(request,'signup.html',{'form':form,'error_keys':err_keys,'error_values':err_values})
+	else:
+		form = CustomUserCreationForm()
+		return render(request,'signup.html',{'form':form,'error_keys':err_keys,'error_values':err_values})
+
+==========12. myapp/templates/home.html=========================
+<html>
+<body bgcolor="black" style="color:white">
+<center> Welcome!!</center>
+<hr/>
+{% if user.is_authenticated %}
+	&ensp; Welcome, {{user.first_name}} {{user.last_name}}<br/>
+	&ensp; You are logged in now. <br/>
+	&ensp; <a href='logout'>LogOut</a>
+{% else %}
+	&ensp; <a href='signup' style="color:orange;">SignUp</a> 
+	&ensp; <a href='login' style="color:orange;"> LogIn</a>
+{% endif %}
+</body>
+</html>
+
+==========13. myapp/templates/login.html==========================
+<body bgcolor="black" style="color:white;">
+<center><h2>Welcome to page Login page.</h2><hr/></center>
+<hr/><hr/>
+
+<form method="POST" action="">
+  {% csrf_token %} <br/>
+	Email: <input type="email" name="email" required> <br/><br/>
+	Pass: &nbsp; <input type="password" name="password" required> <br/><br/>
+  <input type="submit">
+</form>
+<hr/>
+<a  href="/signup"><button>Create New Account</button></a>
+</body>
+
+========14. myapp/urls.py============================================
+from django.urls import path
+from . import views
+
+urlpatterns = [
+		path('',views.index,name="first_page"),
+		path('signup/',views.signup,name="Sign Up"),
+		path('login/',views.login,name="Login"),
+		path('logout/',views.logout,name="LogOut")
+	]
+
+========15. Update myapp/views.py====================================
+from django.contrib import auth
+def index(request):
+	return render(request,'home.html')
+def login(request):
+	if request.method=='POST':
+		print('Inside it')
+		email_1 = request.POST['email']
+		password_1 = request.POST['password']
+		user = auth.authenticate(username=email_1,password=password_1)
+		if user is not None:
+			auth.login(request,user)
+			return redirect('/')
+		else:
+			return redirect('/login/')
+	return render(request,'login.html')
+	
+def logout(request):
+	auth.logout(request)
+	return redirect('/')
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+{% extends "navbar.html" %}
+
+{% block a %}
+<div class="container-fluid" style="">
+	<div class="row">
+		<div class="col-sm-6 offset-sm-3" style="height:80px;">
+		
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-3" style="color:white;">
+			
+			{% if error_keys|length != 0 %}
+				&ensp;Fix these ERRORS first:
+				{% for element in error_values %}
+					{{element}}
+				{% endfor %}
+			{% endif %}
+			
+		</div>
+		<div class="col-sm-6">
+			<div class="card text-white bg-dark mb-3">
+			  <div class="card-header">REGISTER ACCOUNT</div>
+				<div class="card-body">
+					<form method="POST" action="">
+					{% csrf_token %}
+						<div class="row">
+						<div class="col-sm-6" style="margin-bottom:20px;">
+						{{form.first_name}}
+						</div>
+						
+						<div class="col-sm-6" style="margin-bottom:20px;">
+						{{form.last_name}}
+						</div>
+						</div>
+					<div style="margin-bottom:20px;">
+					{{form.email}}
+					</div>
+					<div class="row">
+						<div class="col-sm-6" style="margin-bottom:25px;">
+						{{form.password1}}
+						</div>
+						
+						<div class="col-sm-6" style="margin-bottom:25px;">
+						{{form.password2}}
+						</div>
+					</div>
+					
+					<input class="btn login_btn btn-outline-info" type="submit" value="Register">
+					<span style="float:right;margin-right:5px;"> Already have an account? &nbsp; <a href="/login/" class="badge badge-primary" style="zoom:120%;">Login </a> </span>
+				<!--	<h5 class="card-title">Primary card title</h5>
+					<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+			-->		</form>
+				</div>
+			</div>
+		</div>
+		
+		
+	</div>
+</div>
+{% endblock %}
+
+
+
+
+
+
