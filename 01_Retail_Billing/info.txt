@@ -1,0 +1,8 @@
+To run this:
+With CMD,Go to the folder containing manage.py file
+run: python manage.py runserver
+==========================================
+This is a Django app made for:
+1. Billing System management of retail shop.
+2. Inventory Management.
+===========================================
