@@ -48,7 +48,7 @@ def bill(request):
                 item_dict['amt'] = prd_obj.price * 1
                 if(bill_id==0):
                     dict = {}
-                    dict['status'] = 'initiated'
+                    dict['status'] = 'INITIATED'
                     dict['items'] = {}
                     dict['items']['item'+str(prd_obj.id)] = item_dict
                     dict['bill_value'] = prd_obj.price * 1
@@ -102,7 +102,7 @@ def bill(request):
             if(bill_id != 0):
                 bill_obj = bill_data.objects.get(id=bill_id)
                 dict = json.loads(bill_obj.b)
-                dict['status'] = "paid"
+                dict['status'] = "PAID"
                 bill_obj.b = json.dumps(dict)
                 bill_obj.save()
                 #Changing products database:
@@ -136,7 +136,7 @@ def prev_bill(request):
                 data['bill_dict'] = json.loads(bill_obj.b)
                 data['date_created'] = bill_obj.date_created.strftime('%d-%b-%Y | %H:%M:%S')
                 data['date_updated'] = bill_obj.date_updated.strftime('%d-%b-%Y | %H:%M:%S')
-                
+                print("Getting data: ",data['bill_dict'])
             except:
                 print("ERROR: Bill not found!!")
                 data['issue'] = 'yes'

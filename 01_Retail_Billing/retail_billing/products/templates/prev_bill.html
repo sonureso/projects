@@ -42,7 +42,7 @@ table, th, td {
 
 <body bgcolor="#000;">
 
-
+<!-- Heading TABS  -->
 <center class="t_w">
 	<a href="/" class="t_w t_hover">&Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp;
 	<a href="/add/" class="t_w t_hover">Add Products</a> &ensp;|&ensp;
@@ -107,7 +107,7 @@ $('body').on('click' , '#get_bill', function()
 				for(var key in d){
 					$('#bill_table').append('<tr class=itemrow><td>'+d[key].name+'</td><td>'+d[key].qty+' '+d[key].unit+'</td><td>'+d[key].price+'</td><td>'+d[key].amt+'</td></tr>');
 				}
-				$('#bill_table').append('<tr><td style="color:#89ff36">BILL PAID</td><td colspan=2> Grand Total </td><td>'+data.bill_dict.bill_value+'</td></tr>');
+				$('#bill_table').append('<tr><td style="color:#89ff36">'+data.bill_dict['status']+'</td><td colspan=2> Grand Total </td><td>'+data.bill_dict.bill_value+'</td></tr>');
 			}
 			else
 			{	
