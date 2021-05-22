@@ -129,20 +129,18 @@ def prev_bill(request):
         data['issue'] = 'no'
         what = request.POST['what']
         if(what=='get_bill'):
-            bill_id = int(request.POST['bill_id'])
             try:
+                bill_id = int(request.POST['bill_id'])			
                 bill_obj = bill_data.objects.get(id=bill_id)
                 data['bill_id'] = bill_id
                 data['bill_dict'] = json.loads(bill_obj.b)
                 data['date_created'] = bill_obj.date_created.strftime('%d-%b-%Y | %H:%M:%S')
                 data['date_updated'] = bill_obj.date_updated.strftime('%d-%b-%Y | %H:%M:%S')
-                print("Getting data: ",data['bill_dict'])
             except:
-                print("ERROR: Bill not found!!")
                 data['issue'] = 'yes'
                 data['message'] = 'Bill not found!!'
         else:
-            print("ERROR: Don't try !!")
+            print("ERROR: Don't even try !!")
         return JsonResponse(data)
     else:
         pass
@@ -178,7 +176,7 @@ def upd(request):
             
         else:
             print("updating2..")
-            return HttpResponse("Hello")
+            return HttpResponse("Hello Mr. OverSmart !!")
     else:
         return HttpResponse("Hello")
         

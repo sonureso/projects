@@ -54,7 +54,7 @@ table, th, td {
 </br></br>
 
 <center class="t_w">
-	<input required type="number" min='0' oninput="validity.valid||(value='');" placeholder="Search Bill" name="bill_no" id="bill_no" autofocus style="background-color:black;" class="t_w"> </br></br>
+	<input required type="number" min='0' oninput="validity.valid||(value='');" placeholder="Search Bill" name="bill_no" id="bill_no" autofocus style="background-color:black;" class="t_w" onkeypress="if(event.keyCode == 13){$('#get_bill').click();}"> </br></br>
 	<button class="t_w" style="background-color:black;" name="get_bill" id="get_bill"> Get_bill </button></br> </br></br>
 	<span id="message" class="t_w"></span></br></br>
 	<table class="t_w" style="width:400px; padding:5px;text-align:center;" id="bill_table">
