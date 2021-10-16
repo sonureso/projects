@@ -1,0 +1,84 @@
+<html>
+
+<head>
+<style>
+table, th, td {
+  border: 1px solid white;
+  border-collapse: collapse;
+  padding:4px;
+}
+.t_w{
+	color:white;
+	text-decoration:none;
+}
+.t_hover{
+	color:white;
+}
+.t_hover:hover{
+	color:#ff7a7f;
+}
+</style>
+</head>
+
+<body bgcolor="#000;">
+<center class="t_w">
+	<a href="/" class="t_w t_hover">Go to &Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp; 
+	<a href="/stock_scrapper/" class="t_w t_hover" style="color:#ff7a7f;">Stock_Home<a/> &ensp;|&ensp;
+	<a href="/add/" class="t_w t_hover">Add Products</a> &ensp;|&ensp;
+	<a href="/settings/" class="t_w t_hover">Settings</a>
+</center>
+<hr/>
+</br>
+<center>
+	<div style="background-color:;height:auto;width:350px;">
+		<form method="POST" action="/stock_scrapper/">
+			{% csrf_token %}
+			<span class="t_w" style="">Symbol:&nbsp; &ensp;</span>
+			<select required name="symbol" style="background-color:black;width:170px;" class="t_w" >
+				<option value="IRCTC">IRCTC</option>
+				<option value="CDSL">CDSL</option>
+				<option value="INFY">INFY</option>
+			</select> 		</br></br>
+			<span class="t_w" style="">TimeFrame&nbsp; &ensp;</span>
+			<select required name="tf" style="background-color:black;width:170px;" class="t_w" >
+				<option value="1D">1D</option>
+			</select> 		</br></br>
+
+			<span class="t_w" style="">Start Date:&nbsp; &ensp;</span> 
+			<input type="date" name="st_date" required style="background-color:black;" class="t_w"> </br></br>
+			<span class="t_w" style="">End Date:&nbsp; &ensp;</span> 
+			<input type="date" name="end_date" required style="background-color:black;" class="t_w"> </br></br></br>
+
+			<input class="t_w" style="background-color:black;" type="submit" name="submit_button" value=" Get Data ">
+			
+		</form>
+	</div>
+	<table class="t_w" style="width:550px; padding:5px;">
+		<tr>
+			<th> Date </th>
+			<th> Time </th>
+			<th> Open </th>
+			<th> Close </th>
+			<th> High </th>
+			<th> Low </th>
+			<th> Volume </th>
+		</tr>
+		{% for data in st_data %}
+		<tr style="color:white;" class="itemrow">
+			<td>{{data.date}}</td> &ensp;
+			<td>{{data.time}}</span></td> &ensp;
+			<td>{{data.open}}</td> &ensp;
+			<td>{{data.close}}</td> &ensp;
+			<td>{{data.high}}</td> &ensp;
+			<td>{{data.low}}</td> &ensp;
+			<td>{{data.volume}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+
+	
+</center>
+</br>
+</body>
+</html>

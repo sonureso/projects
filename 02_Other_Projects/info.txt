@@ -1,0 +1,65 @@
+============================================================
+1. Projects creation steps:
+    1. create project with below command:
+        run: django-admin startproject all_projects
+    2. Go to the folder containing manage.py file and create an app:
+        run: python manage.py startapp main_app
+    3. create urls.py, update views.py and few more, as below, inside main_app folder:
+        • create urls.py: 
+            from django.urls import path
+            from . import views
+            urlpatterns = [
+                path('', views.index, name='index'),
+            ]
+        • update views.py file:
+            from django.shortcuts import render
+            from django.http import HttpResponse
+            def index(request):
+                return HttpResponse("Hello, world. You're at main app view.")
+        • update main urls.py:
+            from django.contrib import admin
+            from django.urls import path,include
+            urlpatterns = [
+                path('main_app/',include('main_app.urls')),
+                path('admin/', admin.site.urls),
+            ] 
+        • Add the app name in settings.py file and test it.
+            run: python manage.py runserver
+            open and check this: http://127.0.0.1:8000/main_app/
+    4. Create a folder "templates" inside main_app and create a file home.html in it:
+        -------------------------------------
+        <head>
+        <style>
+            .t_w{color:white;text-decoration:none;}
+            .t_hover{color:white;}
+            .t_hover:hover{color:#ff7a7f;}
+        </style>
+        </head>
+        <body bgcolor="#000;">
+            <center class="t_w">
+                <a href="/" class="t_w t_hover" style="color:#ff7a7f;">&Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp;
+                <a href="/add/" class="t_w t_hover">Add Products</a> &ensp;|&ensp;
+                <a href="/bill/" class="t_w t_hover">Billing</a> &ensp;|&ensp;
+                <a href="/prev_bill/" class="t_w t_hover">Prev Bills</a> &ensp;|&ensp;
+                <a href="/settings/" class="t_w t_hover">Settings</a>
+            </center>
+            <hr/>
+        </body>
+        -------------------------------------
+    5. update views.py file of main_app with below code:
+        def index(request):
+            return render(request,'home.html')
+    6. create an app insta_scrapper and create similar urls.py file:
+        ---------------------------------------------
+        from django.urls import path
+        from . import views
+        urlpatterns = [
+            path('', views.insta_home, name='insta_scrapper'),
+        ]
+        ---------------------------------------------
+        • update main_app urls.py as:
+            path('insta_scrapper/',include('insta_scrapper.urls')),
+        • Now proceed based on the requirements.
+    7. 
+
+
