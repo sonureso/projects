@@ -1,0 +1,6 @@
+Contains Below Projects:
+===================================
+1. Stock Price scrapper: 
+    This part of the project can be used to get the stocks price data for any indian company stock.
+===================================
+2. https://www.youtube.com/watch?v=7IFhsbfby9s

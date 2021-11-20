@@ -1,0 +1,72 @@
+{% load static %}
+<html>
+<head>
+	<script src="{% static 'my_js/jquery.js' %}"></script>  
+<style>
+table, th, td {
+  border: 1px solid white;
+  border-collapse: collapse;
+  padding:4px;
+}
+.t_w{
+	color:white;
+	text-decoration:none;
+}
+.t_backgr{
+	background-color: rgb(80, 20, 20);
+}
+.t_hover{
+	color:white;
+}
+.t_hover:hover{
+	color:#ff7a7f;
+}
+</style>
+</head>
+
+<body bgcolor="#000;">
+<center class="t_w">
+	<a href="/" class="t_w t_hover">Go to &Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp; 
+	<a href="/face_detector/" class="t_w t_hover" style="color:#ff7a7f;">Detect Faces<a/> 
+	
+</center>
+<hr/>
+</br>
+<center>
+<div>
+	<div id="power">
+		<span class="t_w">Upload image to detect faces:&emsp;  </span>
+		<input required type="file" id="face_img" name="filename" class="t_backgr" style="color:rgb(255, 162, 162); border:1px solid rgb(255, 219, 173);">
+		</br></br></br>
+		<button class="t_w t_backgr" id="detect_face">&emsp;Detect Now&emsp;</button>
+	</div>
+</div>
+
+</center>
+</br>
+
+<script>
+
+$('body').on('click' , '#detect_face', function() 
+{ 
+	//var file = $('#face_img');
+	$.ajax( 
+	{ 
+		type:"POST", 
+		url: "/face_detector/detect_face/", 
+		data:{ 
+			what: 'detect_face', 
+			face_img: $('#face_img').val(),
+			csrfmiddlewaretoken: '{{ csrf_token }}' 
+		}, 
+		success: function(data)  
+		{ 
+			alert("Success");
+		}
+	});
+});
+
+
+</script>
+</body>
+</html>
