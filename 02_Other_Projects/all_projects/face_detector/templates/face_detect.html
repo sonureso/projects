@@ -34,12 +34,26 @@ table, th, td {
 </br>
 <center>
 <div>
-	<div id="power">
-		<span class="t_w">Upload image to detect faces:&emsp;  </span>
-		<input required type="file" id="face_img" name="filename" class="t_backgr" style="color:rgb(255, 162, 162); border:1px solid rgb(255, 219, 173);">
-		</br></br></br>
-		<button class="t_w t_backgr" id="detect_face">&emsp;Detect Now&emsp;</button>
+	<div>
+		<form method="POST" action="/face_detector/detect_face/" id="save_image_form" enctype="multipart/form-data">
+			{% csrf_token %}
+			<span class="t_w">Upload image to detect faces:&emsp;  </span>
+			<input type="text" value="save_face" name="what" hidden>
+			<input required onchange="$('#save_image').click();" type="file" id="face_img" name="face_img" class="t_backgr" style="color:rgb(255, 162, 162); border:1px solid rgb(255, 219, 173);">
+				</br>
+			<button class="t_w t_backgr" id="save_image" hidden>&emsp;Save Image&emsp;</button> &emsp;&emsp;
+		</form>
 	</div>
+	<div class="t_w">
+		<img src="" id="photo" style="height:350px;width:auto;border:1px solid white;"></br></br>
+		<span id="ajax_msg" style="font-size:25px;" hidden>Sample Message</span></br>
+		<span id="ajax_msg2" style="font-size:15px;" hidden></span>
+	</div><br/>
+	<form method="POST" action="" id="detect_face_form" hidden>
+		{% csrf_token %}
+		<input type="text" value="detect_face" name="what" hidden>
+		<button class="t_w t_backgr" id="detect_face_btn">&emsp;Detect Now&emsp;</button>
+	</form>
 </div>
 
 </center>
@@ -47,25 +61,60 @@ table, th, td {
 
 <script>
 
-$('body').on('click' , '#detect_face', function() 
-{ 
-	//var file = $('#face_img');
-	$.ajax( 
-	{ 
-		type:"POST", 
-		url: "/face_detector/detect_face/", 
-		data:{ 
-			what: 'detect_face', 
-			face_img: $('#face_img').val(),
-			csrfmiddlewaretoken: '{{ csrf_token }}' 
-		}, 
-		success: function(data)  
-		{ 
-			alert("Success");
-		}
-	});
+$(document).ready(function() {
+$('#photo').hide();
+$('#detect_face_form').hide();
+// Ajax for saving Image:
+$('#save_image_form').submit(function(e) {
+    e.preventDefault();
+    var data = new FormData($('#save_image_form').get(0));
+    //console.log(data);
+	$.ajax({
+        url: '/face_detector/detect_face/', 
+        type: 'POST',
+        data: data,
+        contentType: 'multipart/form-data',
+        processData: false,
+        contentType: false,
+        success: function(data) {
+			$('#photo').show();
+			$('#detect_face_form').show();
+			$('#photo').attr("src","../"+data.img+"?"+new Date().getTime());
+			$("#save_image_form")[0].reset();
+			$('#ajax_msg').hide();
+			$('#ajax_msg2').hide();
+        }
+    });
+    return false;
 });
-
+// Ajax to detect face in image:
+$('#detect_face_form').submit(function(e) {
+    e.preventDefault();
+    var data = new FormData($('#detect_face_form').get(0));
+    //console.log(data);
+	$('#detect_face_form').hide();
+	$('#ajax_msg').html("Wait!! Detecting faces...");
+	$('#ajax_msg').show();
+	$.ajax({
+        url: '/face_detector/detect_face/', 
+        type: 'POST',
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+			if(data.status){
+				$('#ajax_msg').html(data.face_count+" faces found!!");
+				$('#ajax_msg2').show();
+				$('#ajax_msg2').html("Time Taken: "+data.time_taken);
+				$('#photo').attr("src","../static/temp/img_01_detected.jpg?"+new Date().getTime());
+			}
+			console.log(data);
+			console.log(data.status);
+        }
+    });
+    return false;
+});
+});
 
 </script>
 </body>
