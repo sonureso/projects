@@ -1,6 +1,7 @@
+{% load static %}
 <html>
-
 <head>
+	<script src="{% static 'my_js/jquery.js' %}"></script> 
 <style>
 table, th, td {
   border: 1px solid white;
@@ -30,7 +31,7 @@ table, th, td {
 </br>
 <center>
 	<div style="background-color:;height:auto;width:350px;">
-		<form method="POST" action="/stock_scrapper/">
+		<form method="POST" action="/stock_scrapper/" id="get_data_form">
 			{% csrf_token %}
 			<span class="t_w" style="">Symbol:&nbsp; &ensp;</span>
 			<select required name="symbol" style="background-color:black;width:170px;" class="t_w" >
@@ -44,15 +45,59 @@ table, th, td {
 			</select> 		</br></br>
 
 			<span class="t_w" style="">Start Date:&nbsp; &ensp;</span> 
-			<input type="date" name="st_date" required style="background-color:black;" class="t_w"> </br></br>
+			<input type="date" id="st_date" name="st_date" required style="background-color:black;" class="t_w"> </br></br>
 			<span class="t_w" style="">End Date:&nbsp; &ensp;</span> 
-			<input type="date" name="end_date" required style="background-color:black;" class="t_w"> </br></br></br>
+			<input type="date" id="end_date" name="end_date" required style="background-color:black;" class="t_w"> </br></br></br>
 
-			<input class="t_w" style="background-color:black;" type="submit" name="submit_button" value=" Get Data ">
-			
+			<button class="t_w" style="background-color:black;cursor:pointer;" id="submit_button" type="submit" name="submit_button" value=" Get Data "> 
+			Get Data </button> &emsp;
+			<button class="t_w" type="button" onClick="$('#files_list_table').toggle();" style="background-color:black;cursor:pointer;blink"> Show/Hide saved files</button> 
 		</form>
+		
+	
 	</div>
-	<table class="t_w" style="width:550px; padding:5px;">
+	{% if status == 'available' %}
+		<button class="t_w" onClick="$('#info').toggle();" style="background-color:black;cursor:pointer;blink">Show/Hide Info</button> &emsp;
+		<button class="t_w" onClick="$('#data_table').toggle();" style="background-color:black;cursor:pointer;blink">Show/Hide Data</button> &emsp;
+		<button class="t_w" onClick="$('#submit_button').val('save data');$('#submit_button').click();" style="background-color:black;cursor:pointer;">Save as CSV</button> &emsp;
+		
+	{% endif %}
+	<br/>
+	<div style="background-color:;height:auto;" hidden id="info">
+		<br/>
+		<center>
+		<span style="color:#ff7a7f;">• URL: </span>
+		<span class="t_w">
+			{% if url %}
+				{{url}}
+			{% else %}
+				N/A
+			{% endif %}
+		</span>
+		</center>
+	</div>
+	<table class="t_w" style="width:550px; padding:5px;" hidden id="files_list_table">
+		
+		<tr>
+			<th> Symbol </th>
+			<th> Freq </th>
+			<th> st_date </th>
+			<th> end_date </th>
+			<th> filename </th>
+		</tr>
+		{% for file in files_list %}
+		<tr style="color:white;" class="itemrow">
+			<td>{{file.symbol}}</td> &ensp;
+			<td>{{file.tf}}</td> &ensp;
+			<td>{{file.st_date}}</td> &ensp;
+			<td>{{file.end_date}}</td> &ensp;
+			<td style="font-size:12px;">{{file.name}}</td> &ensp;
+		</tr>
+		{% endfor %}
+	</table>
+	
+	<table class="t_w" style="width:550px; padding:5px;" hidden id="data_table">
+		
 		<tr>
 			<th> Date </th>
 			<th> Time </th>
@@ -65,7 +110,7 @@ table, th, td {
 		{% for data in st_data %}
 		<tr style="color:white;" class="itemrow">
 			<td>{{data.date}}</td> &ensp;
-			<td>{{data.time}}</span></td> &ensp;
+			<td>{{data.time}}</td> &ensp;
 			<td>{{data.open}}</td> &ensp;
 			<td>{{data.close}}</td> &ensp;
 			<td>{{data.high}}</td> &ensp;
