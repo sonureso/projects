@@ -34,10 +34,11 @@ table, th, td {
 		<form method="POST" action="/stock_scrapper/" id="get_data_form">
 			{% csrf_token %}
 			<span class="t_w" style="">Symbol:&nbsp; &ensp;</span>
-			<select required name="symbol" style="background-color:black;width:170px;" class="t_w" >
+			<select required id="symbol" name="symbol" style="background-color:black;width:170px;" class="t_w" >
 				<option value="IRCTC">IRCTC</option>
 				<option value="CDSL">CDSL</option>
 				<option value="INFY">INFY</option>
+				<option value="BPCL">BPCL</option>
 			</select> 		</br></br>
 			<span class="t_w" style="">TimeFrame&nbsp; &ensp;</span>
 			<select required name="tf" style="background-color:black;width:170px;" class="t_w" >
@@ -51,16 +52,23 @@ table, th, td {
 
 			<button class="t_w" style="background-color:black;cursor:pointer;" id="submit_button" type="submit" name="submit_button" value=" Get Data "> 
 			Get Data </button> &emsp;
-			<button class="t_w" type="button" onClick="$('#files_list_table').toggle();" style="background-color:black;cursor:pointer;blink"> Show/Hide saved files</button> 
+			<button class="t_w" type="button" onClick="$('#files_list_table').toggle();" style="background-color:black;cursor:pointer;blink"> See saved files</button> 
 		</form>
-		
+			
 	
 	</div>
 	{% if status == 'available' %}
-		<button class="t_w" onClick="$('#info').toggle();" style="background-color:black;cursor:pointer;blink">Show/Hide Info</button> &emsp;
-		<button class="t_w" onClick="$('#data_table').toggle();" style="background-color:black;cursor:pointer;blink">Show/Hide Data</button> &emsp;
+		<button class="t_w" onClick="$('#info').toggle();" style="background-color:black;cursor:pointer;blink">API URL</button> &emsp;
+		<button class="t_w" onClick="$('#data_table').toggle();" style="background-color:black;cursor:pointer;blink">See Data</button> &emsp;
 		<button class="t_w" onClick="$('#submit_button').val('save data');$('#submit_button').click();" style="background-color:black;cursor:pointer;">Save as CSV</button> &emsp;
-		
+		<span class="t_w"> 
+			<script> 
+				
+				document.getElementById("end_date").value = "{{end_date}}";
+				document.getElementById("st_date").value = "{{st_date}}"; 
+				document.getElementById("symbol").value = "{{symbol}}"; 
+			</script> 
+		</span>
 	{% endif %}
 	<br/>
 	<div style="background-color:;height:auto;" hidden id="info">
@@ -81,16 +89,16 @@ table, th, td {
 		<tr>
 			<th> Symbol </th>
 			<th> Freq </th>
-			<th> st_date </th>
-			<th> end_date </th>
+			<!-- <th> st_date </th>
+			<th> end_date </th> -->
 			<th> filename </th>
 		</tr>
 		{% for file in files_list %}
 		<tr style="color:white;" class="itemrow">
 			<td>{{file.symbol}}</td> &ensp;
 			<td>{{file.tf}}</td> &ensp;
-			<td>{{file.st_date}}</td> &ensp;
-			<td>{{file.end_date}}</td> &ensp;
+			<!-- <td>{{file.st_date}}</td> &ensp; -->
+			<!-- <td>{{file.end_date}}</td> &ensp; -->
 			<td style="font-size:12px;">{{file.name}}</td> &ensp;
 		</tr>
 		{% endfor %}
@@ -109,7 +117,7 @@ table, th, td {
 		</tr>
 		{% for data in st_data %}
 		<tr style="color:white;" class="itemrow">
-			<td>{{data.date}}</td> &ensp;
+			<td>{{data.day}}-{{data.month}}-{{data.year}}</td> &ensp;
 			<td>{{data.time}}</td> &ensp;
 			<td>{{data.open}}</td> &ensp;
 			<td>{{data.close}}</td> &ensp;

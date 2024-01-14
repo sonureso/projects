@@ -1,3 +1,6 @@
+# ************************************************ #
+#      views.py for stock_scrapper app
+# ************************************************ #
 from django.shortcuts import render
 from datetime import datetime
 from urllib.request import Request, urlopen
@@ -5,15 +8,16 @@ import json
 import pandas as pd
 import os
 
+# URL: localhost/stock_scrapper/
 def stock_home(request):
     data = {}
     data['status'] = "not available"
     data['st_data'] = "nothing"
-    # save the list of available files:================
+    # save the list of available files: ================
     try:
         path = "stock_scrapper/saved_data/"
         data['files_list'] = os.listdir(path)
-        data['files_list'] = [{'name':file,'symbol':file.split('_')[0], 'tf':file.split('_')[1], 'st_date':file.split('_')[2], 'end_date':file.split('_')[3][:-4]} for file in data['files_list']]
+        data['files_list'] = [{'name':file,'symbol':file.split('_')[0], 'tf':file.split('_')[1].split('.')[0]} for file in data['files_list']]
         #print("List of Files: ",data['files_list'])
     except Exception as e:
         print("Error getting saved files!")
@@ -37,14 +41,31 @@ def stock_home(request):
         data['tf'] = request.POST['tf']
         data['st_date'] = request.POST['st_date']
         data['end_date'] = request.POST['end_date']
+        
         if(request.POST['submit_button'] == ' Get Data '):
             pass
         else:
-            name = data['symbol']+"_"+data['tf']+"_"+data['st_date']+"_"+data['end_date']+".csv"
-            d.to_csv("stock_scrapper/saved_data/"+name,index=False)
+            sync_dataset(data, d)
     else:
         pass
     return render(request,'stocks_home.html',data)
+
+def sync_dataset(data, new_df):
+    path = "stock_scrapper/saved_data/"+data['symbol']+"_"+data['tf']+".csv"
+    name = data['symbol']+"_"+data['tf']+".csv"
+    if(os.path.exists(path)):
+        old_df = pd.read_csv(path)
+        old_df = old_df.astype('str')
+        new_df = new_df.astype('str')
+        final_df = pd.concat([old_df,new_df]).drop_duplicates().sort_values(by='timestamp', ascending=False).astype('str')
+        final_df.to_csv(path, index = False)
+        print("Old file: ",name,"has row count: ", old_df.shape[0])
+        print("New file: ",name,"has row count: ", new_df.shape[0])
+        print("Merged file: ",name,"has row count: ", final_df.shape[0])
+    else:
+        print("Creating Data file: ",data['symbol']+"_"+data['tf']+".csv", end = " ")
+        new_df.to_csv(path, index = False)
+        print(new_df.shape[0],"Rows -> Completed!")
 
 def get_data(symbol,st,et,r):
     if(st!=1 and et!=1 and (r=="1D" or r=="1")):
@@ -73,15 +94,20 @@ def bring_data(url):
         d['webpage'] = webpage
         return d
     except Exception as e:
-        print("bring_data: Exception occurred:-",str(e))
+        print("01. Check your network connection!")
+        print("02. ERROR in bring_data: Exception occurred:-",str(e))
         return 1
 
 def process_data(page):
     try:
         data = json.loads(page)
         d = pd.DataFrame()
-        d["date"] = [datetime.fromtimestamp(int(t)).date() for t in data['t']]
-        d["time"] = [datetime.fromtimestamp(int(t)).time() for t in data['t']]
+        d["timestamp"] = data['t']
+        # d["date"] = [datetime.fromtimestamp(int(t)).date() for t in data['t']]
+        d["day"] = [datetime.fromtimestamp(int(t)).date().day for t in data['t']]
+        d["month"] = [datetime.fromtimestamp(int(t)).date().month for t in data['t']]
+        d["year"] = [datetime.fromtimestamp(int(t)).date().year for t in data['t']]
+        d["time"] = [str(datetime.fromtimestamp(int(t)).time()) for t in data['t']]
         d["open"] = data['o']
         d["close"] = data['c']
         d["high"] = data['h']

@@ -48,7 +48,7 @@ def detect_face(request):
                 img = imutils.resize(img, width=900)
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 faces = face_cascade.detectMultiScale(gray, 1.1, 11)
-                #faces = face_cascade.detectMultiScale(gray, 1.05, minNeighbors=5, minSize=(30, 30), flags=cv2.CASCADE_SCALE_IMAGE)
+                # faces = face_cascade.detectMultiScale(gray, 1.05, minNeighbors=5, minSize=(30, 30), flags=cv2.CASCADE_SCALE_IMAGE)
                 for (x, y, w, h) in faces:
                     cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 6)
                 cv2.imwrite("static/temp/img_01_detected.jpg", img)
