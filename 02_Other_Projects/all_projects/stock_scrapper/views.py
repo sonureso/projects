@@ -1,12 +1,13 @@
 # ************************************************ #
 #      views.py for stock_scrapper app
 # ************************************************ #
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from datetime import datetime
 from urllib.request import Request, urlopen
 import json
 import pandas as pd
 import os
+import glob
 
 # URL: localhost/stock_scrapper/
 def stock_home(request):
@@ -17,10 +18,12 @@ def stock_home(request):
     try:
         path = "stock_scrapper/saved_data/"
         data['files_list'] = os.listdir(path)
+        data['files_list'] = [file for file in data['files_list'] if ".csv" in file]
+        # print("Files List: ", data['files_list'])
         data['files_list'] = [{'name':file,'symbol':file.split('_')[0], 'tf':file.split('_')[1].split('.')[0]} for file in data['files_list']]
         #print("List of Files: ",data['files_list'])
     except Exception as e:
-        print("Error getting saved files!")
+        print("Error getting saved files!",str(e))
     if request.method=='POST':
         d = {}
         d['symbol'] = request.POST['symbol']
@@ -50,6 +53,47 @@ def stock_home(request):
         pass
     return render(request,'stocks_home.html',data)
 
+# URL: localhost/stock_scrapper/dataset/
+def dataset(request):
+    data = {}
+    data['status'] = "home"
+    # save the list of available files: ================
+    try:
+        path = "stock_scrapper/saved_data/"
+        data['files_list'] = os.listdir(path)
+        data['files_list'] = [file for file in data['files_list'] if ".csv" in file]
+        data['files_list'] = [{'name':file,'symbol':file.split('_')[0], 'tf':file.split('_')[1].split('.')[0]} for file in data['files_list']]
+    except Exception as e:
+        print("Error getting saved files!")
+
+    return render(request,'stocks_dataset.html',data)
+
+# URL: localhost/stock_scrapper/dataset_details/
+def dataset_details(request):
+    data = {}
+    data['status'] = "details_page"
+    if request.method=='POST':
+        data['dataset_name'] = request.POST.get('dataset_name','Not Available')
+        data['symbol'], data['tf'] = data['dataset_name'].split("_")[0], data['dataset_name'].split("_")[1]
+        path = "stock_scrapper/saved_data/"+data['dataset_name']+".csv"
+        if(os.path.exists(path)):
+            df = pd.read_csv(path)
+            data['st_data'] = df.to_dict('records')
+            data['st_date'] = datetime.fromtimestamp(data['st_data'][-1]['timestamp']).strftime('%d-%b-%Y')
+            data['end_date'] = datetime.fromtimestamp(data['st_data'][0]['timestamp']).strftime('%d-%b-%Y')
+            data['rows'] = len(data['st_data'])
+        else:
+            print("Path Doesn't exists: ",path)
+        return render(request,'stocks_dataset_details.html',data)
+        # create separate HTML page for this.
+    else:
+        return redirect('/stock_scrapper/dataset/')
+
+
+
+# ======================================================= #
+# ========== SUPPORT FUNCTIONS for stock_home =========== #
+# ======================================================= # 
 def sync_dataset(data, new_df):
     path = "stock_scrapper/saved_data/"+data['symbol']+"_"+data['tf']+".csv"
     name = data['symbol']+"_"+data['tf']+".csv"
@@ -64,6 +108,7 @@ def sync_dataset(data, new_df):
         print("Merged file: ",name,"has row count: ", final_df.shape[0])
     else:
         print("Creating Data file: ",data['symbol']+"_"+data['tf']+".csv", end = " ")
+        new_df = new_df.sort_values(by='timestamp', ascending=False).astype('str')
         new_df.to_csv(path, index = False)
         print(new_df.shape[0],"Rows -> Completed!")
 
@@ -117,3 +162,5 @@ def process_data(page):
     except Exception as e:
         print("process_data: Exception Occured:- ",str(e))
         return 1
+
+

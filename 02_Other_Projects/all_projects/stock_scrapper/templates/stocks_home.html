@@ -14,6 +14,8 @@ table, th, td {
 }
 .t_hover{
 	color:white;
+	text-decoration:none;
+	cursor:pointer;
 }
 .t_hover:hover{
 	color:#ff7a7f;
@@ -24,8 +26,8 @@ table, th, td {
 <body bgcolor="#000;">
 <center class="t_w">
 	<a href="/" class="t_w t_hover">Go to &Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp; 
-	<a href="/stock_scrapper/" class="t_w t_hover" style="color:#ff7a7f;">Stock_Home<a/> 
-	
+	<a href="/stock_scrapper/" class="t_w t_hover" style="color:#ff7a7f;">Stock Home<a/> &ensp;|&ensp; 
+	<a href="/stock_scrapper/dataset/" class="t_w t_hover">Dataset<a/>
 </center>
 <hr/>
 </br>
@@ -33,21 +35,22 @@ table, th, td {
 	<div style="background-color:;height:auto;width:350px;">
 		<form method="POST" action="/stock_scrapper/" id="get_data_form">
 			{% csrf_token %}
-			<span class="t_w" style="">Symbol:&nbsp; &ensp;</span>
+			<span class="t_w">Symbol:&nbsp; &ensp;</span>
 			<select required id="symbol" name="symbol" style="background-color:black;width:170px;" class="t_w" >
 				<option value="IRCTC">IRCTC</option>
 				<option value="CDSL">CDSL</option>
 				<option value="INFY">INFY</option>
 				<option value="BPCL">BPCL</option>
+				<option value="PAYTM">PAYTM</option>
 			</select> 		</br></br>
-			<span class="t_w" style="">TimeFrame&nbsp; &ensp;</span>
+			<span class="t_w">TimeFrame&nbsp; &ensp;</span>
 			<select required name="tf" style="background-color:black;width:170px;" class="t_w" >
 				<option value="1D">1D</option>
 			</select> 		</br></br>
 
-			<span class="t_w" style="">Start Date:&nbsp; &ensp;</span> 
+			<span class="t_w">Start Date:&nbsp; &ensp;</span> 
 			<input type="date" id="st_date" name="st_date" required style="background-color:black;" class="t_w"> </br></br>
-			<span class="t_w" style="">End Date:&nbsp; &ensp;</span> 
+			<span class="t_w">End Date:&nbsp; &ensp;</span> 
 			<input type="date" id="end_date" name="end_date" required style="background-color:black;" class="t_w"> </br></br></br>
 
 			<button class="t_w" style="background-color:black;cursor:pointer;" id="submit_button" type="submit" name="submit_button" value=" Get Data "> 
@@ -58,7 +61,7 @@ table, th, td {
 	
 	</div>
 	{% if status == 'available' %}
-		<button class="t_w" onClick="$('#info').toggle();" style="background-color:black;cursor:pointer;blink">API URL</button> &emsp;
+		<button class="t_w" onClick="$('#info').toggle();" style="background-color:black; cursor:pointer;blink">API URL</button> &emsp;
 		<button class="t_w" onClick="$('#data_table').toggle();" style="background-color:black;cursor:pointer;blink">See Data</button> &emsp;
 		<button class="t_w" onClick="$('#submit_button').val('save data');$('#submit_button').click();" style="background-color:black;cursor:pointer;">Save as CSV</button> &emsp;
 		<span class="t_w"> 
@@ -93,41 +96,46 @@ table, th, td {
 			<th> end_date </th> -->
 			<th> filename </th>
 		</tr>
-		{% for file in files_list %}
-		<tr style="color:white;" class="itemrow">
-			<td>{{file.symbol}}</td> &ensp;
-			<td>{{file.tf}}</td> &ensp;
-			<!-- <td>{{file.st_date}}</td> &ensp; -->
-			<!-- <td>{{file.end_date}}</td> &ensp; -->
-			<td style="font-size:12px;">{{file.name}}</td> &ensp;
-		</tr>
-		{% endfor %}
+		<!-- Form for opening dataset details -->
+		<form method="POST" action="/stock_scrapper/dataset_details/" id="form_get_dataset_name">
+			{% csrf_token %}
+				<input type="text" id="dataset_name" name="dataset_name" required style="background-color:black;" class="t_w" hidden>
+				{% for file in files_list %}
+				<tr style="color:white;" class="itemrow">
+					<td class="t_hover" onClick="$('#dataset_name').val('{{file.symbol}}_{{file.tf}}'); $('#form_get_dataset_name').submit();">
+						{{file.symbol}}
+					</td> &ensp;
+					
+					<td>{{file.tf}}</td> &ensp;
+					<td style="font-size:12px;">{{file.name}}</td> &ensp;
+				</tr>
+				{% endfor %}
+		</form>
 	</table>
-	
-	<table class="t_w" style="width:550px; padding:5px;" hidden id="data_table">
-		
+	<div style="height: 200px; width:600px; overflow: auto;" hidden id="data_table">
+	<table class="t_w" style="width:550px;"> 
 		<tr>
-			<th> Date </th>
-			<th> Time </th>
-			<th> Open </th>
-			<th> Close </th>
-			<th> High </th>
-			<th> Low </th>
-			<th> Volume </th>
+			<th>Date</th>  &ensp;
+			<th>Time</th> &ensp;
+			<th>Open</th> &ensp;
+			<th>Close</th> &ensp;
+			<th>High</th> &ensp;
+			<th>Low</th> &ensp;
+			<th>Volume</th> &ensp;
 		</tr>
 		{% for data in st_data %}
 		<tr style="color:white;" class="itemrow">
-			<td>{{data.day}}-{{data.month}}-{{data.year}}</td> &ensp;
-			<td>{{data.time}}</td> &ensp;
-			<td>{{data.open}}</td> &ensp;
-			<td>{{data.close}}</td> &ensp;
-			<td>{{data.high}}</td> &ensp;
-			<td>{{data.low}}</td> &ensp;
+			<td>{{data.day}}-{{data.month}}-{{data.year}}</td>
+			<td>{{data.time}}</td>
+			<td>{{data.open}}</td>
+			<td>{{data.close}}</td> 
+			<td>{{data.high}}</td>
+			<td>{{data.low}}</td>
 			<td>{{data.volume}}</td>
 		</tr>
 		{% endfor %}
 	</table>
-
+	</div>
 
 	
 </center>

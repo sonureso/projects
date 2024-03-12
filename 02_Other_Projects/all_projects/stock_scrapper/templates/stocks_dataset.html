@@ -1,0 +1,78 @@
+{% load static %}
+<html>
+<head>
+	<script src="{% static 'my_js/jquery.js' %}"></script> 
+<style>
+    table, th, td {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding:4px;
+    }
+    .t_w{
+        color:white;
+        text-decoration:none;
+    }
+    .t_hover{
+        cursor:pointer;
+	    color:white;
+        text-decoration:none;
+    }
+    .t_hover:hover{
+        color:#ff7a7f;
+    }
+</style>
+</head>
+<!-- Section-01: Headers/Page links ---------------------------->
+<body bgcolor="#000;">
+    <center class="t_w">
+        <a href="/" class="t_hover">Go to &Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp; 
+        <a href="/stock_scrapper/" class="t_hover">Stock Home<a/> &ensp;|&ensp; 
+        <a href="/stock_scrapper/dataset/" class="t_hover" style="color:#ff7a7f;">Dataset<a/>
+    </center>
+<hr/></br>
+
+
+<center>
+
+
+<!-- Section-02: List of datasets -->
+{% if status == 'home' %}
+<table class="t_w" style="width:550px; padding:5px;" id="files_list_table">
+    <tr>
+        <th> Symbol </th>
+        <th> Freq </th>
+        <th> filename </th>
+    </tr>
+    <!-- Form for collecting dataset name -->
+    <form method="POST" action="/stock_scrapper/dataset_details/" id="form_get_dataset_name">
+    {% csrf_token %}
+        <input type="text" id="dataset_name" name="dataset_name" required style="background-color:black;" class="t_w" hidden>
+        {% for file in files_list %}
+        <tr style="color:white;" class="itemrow">
+            <td class="t_hover" onClick="$('#dataset_name').val('{{file.symbol}}_{{file.tf}}'); $('#form_get_dataset_name').submit();">
+                {{file.symbol}}
+            </td> &ensp;
+            
+            <td>{{file.tf}}</td> &ensp;
+            <td style="font-size:12px;">{{file.name}}</td> &ensp;
+        </tr>
+        {% endfor %}
+    </form>
+</table>
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</center>
+</body>
+</html>

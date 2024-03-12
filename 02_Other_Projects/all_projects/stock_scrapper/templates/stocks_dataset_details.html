@@ -1,0 +1,87 @@
+{% load static %}
+<html>
+<head>
+	<script src="{% static 'my_js/jquery.js' %}"></script> 
+<style>
+    table, th, td {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding:4px;
+    scrollbar-color: pink lightblue;
+    }
+    .t_w{
+        color:white;
+        text-decoration:none;
+    }
+    .t_hover{
+        cursor:pointer;
+	    color:white;
+        text-decoration:none;
+    }
+    .t_hover:hover{
+        color:#ff7a7f;
+    }
+    
+</style>
+</head>
+<!-- Section-01: Headers/Page links ---------------------------->
+<body bgcolor="#000;">
+    <center class="t_w">
+        <a href="/" class="t_hover">Go to &Hfr;&ofr;&mfr;&efr;</a> &ensp;|&ensp; 
+        <a href="/stock_scrapper/" class="t_hover">Stock Home</a> &ensp;|&ensp; 
+        <a href="/stock_scrapper/dataset/" class="t_hover" style="color:#ff7a7f;">Dataset<a/>
+    </center>
+<hr/></br>
+<center>
+
+
+<!-- Section-02: List of datasets -->
+{% if status == 'details_page' %}
+    {% if symbol %}
+    <div style="width:600px; background-color:rgb(81, 158, 85, 0);" id="data_info">
+        <span class="t_w">{{dataset_name}} &ensp;|&ensp; {{st_date}} to {{end_date}} &ensp;|&ensp; {{rows}} data rows</span>  </br>
+        <!-- <span class="t_w"> . </span> </br></br> -->
+    </div>
+</br>
+    <div style="height: 400px; width:600px; overflow:auto;" id="data_table">
+        <table class="t_w" style="width:550px;"> 
+            <tr>
+                <th>Date</th>  &ensp;
+                <th>Time</th> &ensp;
+                <th>Open</th> &ensp;
+                <th>Close</th> &ensp;
+                <th>High</th> &ensp;
+                <th>Low</th> &ensp;
+                <th>Volume</th> &ensp;
+            </tr>
+            {% for data in st_data %}
+            <tr style="color:white;" class="itemrow">
+                <td>{{data.day}}-{{data.month}}-{{data.year}}</td>
+                <td>{{data.time}}</td>
+                <td>{{data.open}}</td>
+                <td>{{data.close}}</td> 
+                <td>{{data.high}}</td>
+                <td>{{data.low}}</td>
+                <td>{{data.volume}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</center>
+</body>
+</html>
