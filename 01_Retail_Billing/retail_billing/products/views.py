@@ -1,12 +1,22 @@
 # products views.py
 from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
-from products.models import product,bill_data
+from products.models import product, bill_data
 import json
+from django.contrib.auth.decorators import login_required
 
 def index(request):
+    data = {}
+    if request.user.is_authenticated:
+        return render(request,'home.html')
+    else:
+        return HttpResponse("<body style='background-color:black;color:white;'><center><br><br><br><br> Login: <a href='login/' style='color:rgb(255, 190, 106);'>Click Here</a></center></body>")
+
+@login_required(login_url='/login/')
+def home(request):
     return render(request,'home.html')
     
+@login_required(login_url='/login/')
 def add_product(request):
     data = {}
     data['products'] = list(product.objects.all().order_by('-id'))[:5]
@@ -21,7 +31,8 @@ def add_product(request):
         return redirect('/add/')
     else:
         return render(request,'add_product.html',data)
-      
+
+@login_required(login_url='/login/')
 def bill(request):
     if 'term' in request.GET:
         product_names = []
@@ -121,7 +132,8 @@ def bill(request):
     else:
         data = {}
         return render(request,'bill.html',data)
-        
+
+@login_required(login_url='/login/')
 def prev_bill(request):
     data = {}
     if request.method=='POST':
@@ -145,12 +157,14 @@ def prev_bill(request):
     else:
         pass
         return render(request,'prev_bill.html',data)
-           
+
+@login_required(login_url='/login/')    
 def settings(request):
     data = {}
     data['products'] = list(product.objects.all().order_by('-id'))[:]
     return render(request,'settings.html',data)
-        
+
+@login_required(login_url='/login/')
 def upd(request):
     data = {}
     if request.method=='POST':
