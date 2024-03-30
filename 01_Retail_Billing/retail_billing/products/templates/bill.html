@@ -38,6 +38,16 @@ table, th, td {
 	color:#ff7a7f;
 	cursor:pointer;
 }
+.ui-autocomplete {	
+    background-color: inherit;
+	color: white;
+	font-size: 0.75em;
+}
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background: rgb(0, 0, 0);
+	color: #ff7a7f;
+} 
+
 </style>
 </head>
 
@@ -84,7 +94,7 @@ table, th, td {
 $('#bill_table').hide();
 $('#paid_btn').hide();
 // Script for autocomplete:
-$( function() {
+$(function() {
   $( "#product" ).autocomplete({
     source: "/bill/",
   minLength: 2
