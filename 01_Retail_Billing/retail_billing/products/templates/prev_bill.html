@@ -1,4 +1,5 @@
 {% load static %}
+{% load extra_filters %}
 <html>
 
 <head>
@@ -46,14 +47,15 @@ table, th, td {
 	
 	<center class="t_w">
 		<a href="/" class="t_w t_hover">  &#127968; &Hfr;&ofr;&mfr;&efr;<a/> &ensp;|&ensp;
-		<a href="/add/" class="t_w t_hover">Add Products</a> &ensp;|&ensp;
 		<a href="/bill/" class="t_w t_hover">Billing</a> &ensp;|&ensp;
-		<a href="/prev_bill/" class="t_w t_hover" style="color:#ff7a7f;">Prev Bills</a> &ensp;|&ensp;
-		<a href="/settings/" class="t_w t_hover">Settings</a> 
-		
-		<a href="/logout/" class="t_w t_hover" style="float:inline-end;">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;Logout &#10097;&#10097;&ensp;&ensp; </a>
-	<hr/>
-	</center>
+		<a href="/prev_bill/" class="t_w t_hover" style="color:#ff7a7f;">Prev Bills</a>
+		{% if request|has_group:'store_manager' %}
+			&ensp;|&ensp; <a href="/add/" class="t_w t_hover">Add Products</a> &ensp;|&ensp;
+			<a href="/settings/" class="t_w t_hover">Settings</a> 
+		{% endif %}
+		<a href="/logout/" class="t_w t_hover" style="float:inline-end;">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; Logout &#10097;&#10097;&ensp;&ensp; </a>
+		<hr/>
+		</center>
 </br></br>
 
 <center class="t_w">

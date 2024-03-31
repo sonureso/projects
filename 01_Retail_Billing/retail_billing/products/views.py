@@ -4,6 +4,7 @@ from django.http import HttpResponse,JsonResponse
 from products.models import product, bill_data
 import json
 from django.contrib.auth.decorators import login_required
+from .templatetags.extra_filters import has_group
 
 def index(request):
     data = {}
@@ -15,22 +16,6 @@ def index(request):
 @login_required(login_url='/login/')
 def home(request):
     return render(request,'home.html')
-    
-@login_required(login_url='/login/')
-def add_product(request):
-    data = {}
-    data['products'] = list(product.objects.all().order_by('-id'))[:5]
-    if request.method=='POST':
-        prd_nm = request.POST['prd_name']
-        sp = request.POST['sp']
-        unit = request.POST['unit']
-        qty = request.POST['qty']
-        tags = request.POST['tags']
-        new_prd = product(name=prd_nm,price=sp,unit=unit,tags=tags,available_qty=qty)
-        new_prd.save()
-        return redirect('/add/')
-    else:
-        return render(request,'add_product.html',data)
 
 @login_required(login_url='/login/')
 def bill(request):
@@ -158,16 +143,41 @@ def prev_bill(request):
         pass
         return render(request,'prev_bill.html',data)
 
+# require group -> store manager
+@login_required(login_url='/login/')
+def add_product(request):
+    data = {}
+    data['products'] = list(product.objects.all().order_by('-id'))[:5]
+    if not has_group(request, 'store_manager'):
+        return redirect('/home/')
+    elif request.method=='POST':
+        prd_nm = request.POST['prd_name']
+        sp = request.POST['sp']
+        unit = request.POST['unit']
+        qty = request.POST['qty']
+        tags = request.POST['tags']
+        new_prd = product(name=prd_nm,price=sp,unit=unit,tags=tags,available_qty=qty)
+        new_prd.save()
+        return redirect('/add/')
+    else:
+        return render(request,'add_product.html',data)
+
+# require group -> store manager
 @login_required(login_url='/login/')    
 def settings(request):
+    if not has_group(request, 'store_manager'):
+        return redirect('/home/')
     data = {}
     data['products'] = list(product.objects.all().order_by('-id'))[:]
     return render(request,'settings.html',data)
 
+# require group -> store manager
 @login_required(login_url='/login/')
 def upd(request):
     data = {}
-    if request.method=='POST':
+    if not has_group(request, 'store_manager'):
+        return redirect('/home/')
+    elif request.method=='POST':
         what = request.POST['upd_what']
         prd_id = request.POST['upd_id']
         obj = product.objects.get(id=prd_id)
