@@ -9,13 +9,18 @@ from .templatetags.extra_filters import has_group
 def index(request):
     data = {}
     if request.user.is_authenticated:
-        return render(request,'home.html')
+        return redirect('/home/')
     else:
         return HttpResponse("<body style='background-color:black;color:white;'><center><br><br><br><br> Login: <a href='login/' style='color:rgb(255, 190, 106);'>Click Here</a></center></body>")
 
 @login_required(login_url='/login/')
 def home(request):
-    return render(request,'home.html')
+    data = {}
+    data['PV'] = 0  # PV: Product Valuation
+    items = list(product.objects.all().order_by('-id'))[:]
+    for item in items:
+        data['PV'] = data['PV'] + (item.price * item.available_qty)
+    return render(request,'home.html', data)
 
 @login_required(login_url='/login/')
 def bill(request):
@@ -121,8 +126,18 @@ def bill(request):
 @login_required(login_url='/login/')
 def prev_bill(request):
     data = {}
+    ## ****** Collect Recent Bills ****** ##
+    data['recent_bills'] = {}
+    bill_objs = list(bill_data.objects.all().order_by('-date_updated'))[:50]
+    for bill_obj in bill_objs:
+        d = {}
+        d['bill_id'] = bill_obj.id
+        d['bill_dict'] = json.loads(bill_obj.b)
+        d['date_created'] = bill_obj.date_created.strftime('%d-%b-%Y | %H:%M')
+        d['date_updated'] = bill_obj.date_updated.strftime('%d-%b-%Y | %H:%M')
+        data['recent_bills'][bill_obj.id] = d
+    ## ****** Check for any special requested ****** ##
     if request.method=='POST':
-        data = {}
         data['issue'] = 'no'
         what = request.POST['what']
         if(what=='get_bill'):
@@ -140,7 +155,6 @@ def prev_bill(request):
             print("ERROR: Don't even try !!")
         return JsonResponse(data)
     else:
-        pass
         return render(request,'prev_bill.html',data)
 
 # require group -> store manager
@@ -203,9 +217,11 @@ def upd(request):
             return HttpResponse("Hello Mr. OverSmart !!")
     else:
         return HttpResponse("Hello")
-        
-        
-        
+
+
+# ******************************************************************* #
+# ********* Additional Helper Functions ***************************** #
+# ******************************************************************* #        
         
         
         

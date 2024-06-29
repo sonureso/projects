@@ -57,11 +57,43 @@ table, th, td {
 		<hr/>
 		</center>
 </br></br>
-
+<!------------------------------------------------------------------------------------------------------->
+<!----------------- Search Bills and See previous Bills ------------------------------------------------->
+<!------------------------------------------------------------------------------------------------------->
 <center class="t_w">
 	<input required type="number" min='0' oninput="validity.valid||(value='');" placeholder="Search Bill" name="bill_no" id="bill_no" autofocus style="background-color:black;" class="t_w" onkeypress="if(event.keyCode == 13){$('#get_bill').click();}"> </br></br>
-	<button class="t_w" style="background-color:black;" name="get_bill" id="get_bill"> Get_bill </button></br> </br></br>
-	<span id="message" class="t_w"></span></br></br>
+	<button class="t_w" style="background-color:black;" name="get_bill" id="get_bill"> Get_bill </button>
+	</br></br><span id="message" class="t_w"></span></br>
+
+	<!----------------- DISPLAY LAST 30 BILL INFORMATION ---------------------------------------------------->
+
+	<div style="overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; height: 200px;">
+	<table class="t_w" style="width:450px; height:500px; text-align:center;font-size: 90%;">
+		<tr>
+			<td colspan=5><center style="color:#ff7a7f;">Recent Bills</center></td>
+		</tr>
+		<tr style="background-color: rgb(122, 1, 1); position: sticky; top: 1; z-index: 1;">
+			<th> Bill id </th>
+			<th> Billing Timestamp </th>
+			<th> Amount </th>
+			<th> Items</th>
+			<th> Status</th>
+		</tr>
+		
+		{% for bill_id, bill in recent_bills.items %}
+		<tr style="color:white;">
+			<td class="recent_bill_id t_hover" id="bill_{{bill.bill_id}}" style="cursor: pointer;">{{bill_id}}</td> &ensp;
+			<td>{{bill.date_updated}}</td> &ensp;
+			<td>{{bill.bill_dict.bill_value}}</td> &ensp;
+			<td>{{bill.bill_dict.items | length}}</td> &ensp;
+			<td><span style="color:#89ff36;">{{bill.bill_dict.status}}</span></td>
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	<br/>
+	<!----------------- DISPLAY SPECIFIC BILL INFORMATION --------------------------------------------------->
+
 	<table class="t_w" style="width:400px; padding:5px;text-align:center;" id="bill_table">
 		<tr>
 			<td colspan=4>
@@ -70,7 +102,7 @@ table, th, td {
 				<span class="bill_date"></span>
 			</center></td>
 		</tr>
-		<tr>
+		<tr style="background-color: rgb(122, 1, 1);">
 			<th> Prd Name </th>
 			<th> Qty </th>
 			<th> Price </th>
@@ -83,8 +115,8 @@ table, th, td {
 	</table>
 </center>
 
-
 <script>
+
 $('#bill_table').hide();
 $('body').on('click' , '#get_bill', function() 
 {
@@ -99,7 +131,6 @@ $('body').on('click' , '#get_bill', function()
 		}, 
 		success: function( data )  
 		{ 
-			//console.log("Issue: ",data.issue)
 			if(data.issue=='no')
 			{
 				$('#bill_table').show();
@@ -125,8 +156,12 @@ $('body').on('click' , '#get_bill', function()
 		}
 	});
 });
-
-
+// Script for opening any specific bill id:
+$('.recent_bill_id').click(function()
+{
+	$('#bill_no').val(this.id.substr(5,));
+	$('#get_bill').click();
+});
 </script>
 </body>
 </html>
