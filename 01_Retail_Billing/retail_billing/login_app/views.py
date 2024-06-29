@@ -22,12 +22,14 @@ def login(request):
             return redirect("/home/")
         else:
             data['on'] = 'login_form'
+            data['msg_color'] = '#ff3e3e'
             data['msg'] = 'Invalid Username or password! Please retry with correct details...'
             return render(request, "login_page.html", data)
     elif request.user.is_authenticated:
         data['on'] = 'home_page'
         return redirect("/home/")
     else:
+        data['msg_color'] = '#5cff1c'
         data['msg'] = 'Please enter credentials...'
         return render(request, "login_page.html", data)
 
@@ -44,4 +46,5 @@ def register(request):
         return redirect("/login/")
     else:
         data['msg'] = 'Please register with username and new password'
+        data['msg_color'] = '#5cff1c'
         return render(request, "login_page.html", data)

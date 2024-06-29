@@ -11,6 +11,7 @@
             }
             a:hover{
                 color: rgb(255, 190, 106);
+                /* color: #ff3e3e; */
             }
         </style>
     </head>
@@ -20,7 +21,7 @@
         <h2>
             Welcome to the Login Page
         </h2>
-        </br></br>{{msg}}</br></br>
+        </br></br><span id="message" style="color:{{msg_color}};">{{msg}}</span></br></br>
         <form action="/login/" method="post">
             {% csrf_token %}
             Username: <input type="text" name="user" autocomplete="off"> </br></br>
@@ -33,7 +34,7 @@
         <h2>
             Kindly Register Yourself!
         </h2>
-        </br></br>{{msg}}</br></br>
+        </br></br><span id="message" style="color:{{msg_color}};">{{msg}}</span></br></br>
         <form action="/register/" method="post">
             {% csrf_token %}
             Username: <input type="text" name="user" autocomplete="off"> </br></br>
@@ -43,5 +44,6 @@
     {% endif %}
 
 </center>
+
 </body>
 </html>
